@@ -39,7 +39,6 @@ export default function Home() {
   useEffect(() => {
     fetchStudentsWithMarks();
   }, []);
-
   return (
     <div>
       <header className="p-4 bg-gray-100 fixed top-0 w-full z-40">
