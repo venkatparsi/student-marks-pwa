@@ -32,14 +32,15 @@ export default function StudentForm({ onClose, onSave, student }) {
         .getPublicUrl(fileName);
 
       photoUrl = publicURL;
+      console.log("public url....",publicURL)
       setUploading(false);
     }
 
     // Save to database
-    const { error } = await supabase.from("student_marks").insert([
+    const { error } = await supabase.from("students").insert([
       {
-        student_name: name,
-        student_photo: photoUrl,
+        name: name,
+        photo_id: photoUrl,
       },
     ]);
 

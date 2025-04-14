@@ -13,13 +13,31 @@ export default function Home() {
   const [showForm, setShowForm] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  const fetchStudents = async () => {
-    const { data } = await supabase.from("student_marks").select("*");
+  const fetchStudentsWithMarks = async () => {
+    const { data, error } = await supabase
+      .from('student_marks')
+      .select(`
+        *,
+        students:student_id (
+          id,
+          name,
+          address,
+          photo_id
+        )
+      `);
+  
+    if (error) {
+      console.error('Error fetching joined data:', error.message);
+      return;
+    }
+  
+    console.log(data); // Each row includes `student_marks` fields + `students` object
     setStudents(data || []);
   };
+  
 
   useEffect(() => {
-    fetchStudents();
+    fetchStudentsWithMarks();
   }, []);
 
   return (
@@ -51,22 +69,24 @@ export default function Home() {
           </thead>
           <tbody>
             {students.map((s) => (
+                          
               <tr
                 key={s.id}
                 className="border-t hover:bg-gray-50 cursor-pointer"
-                onClick={() => {
+                onClick={() => window.location.href = `/view?id=${s.id}`}
+                onClick2={() => {
                   setSelectedStudent(s);
                   setShowForm(true);
                 }}
               >
                 <td className="p-2">
                   <img
-                    src={s.student_photo}
+                    src={s.photo_id}
                     alt="student"
                     className="w-12 h-12 rounded-full"
                   />
                 </td>
-                <td className="p-2">{s.student_name}</td>
+                <td className="p-2">{s.students.name}</td>
                 <td className="p-2">
                   <QRCode
                     value={`https://your-vercel-app.vercel.app/view?id=${s.id}`}
@@ -83,7 +103,7 @@ export default function Home() {
         <StudentForm
           student={selectedStudent}
           onClose={() => setShowForm(false)}
-          onSave={fetchStudents}
+          onSave={fetchStudentsWithMarks}
         />
       )}
     </div>
