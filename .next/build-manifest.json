@@ -27,6 +27,11 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
+    "/scanner": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/scanner.js"
+    ],
     "/view": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
