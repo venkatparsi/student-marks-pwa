@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import QRCode from 'qrcode.react';
+import QRCode from 'react-qr-code';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
