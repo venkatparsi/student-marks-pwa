@@ -11,6 +11,7 @@ const supabase = createClient(
 
 export default function ScannerPage() {
   const webcamRef = useRef(null);
+  const [facingMode, setFacingMode] = useState('environment');
   const router = useRouter();
   const { studentId: queryStudentId, testId: queryTestId } = router.query;
 
@@ -19,6 +20,15 @@ export default function ScannerPage() {
   const [testId, setTestId] = useState('');
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
+
+  const videoConstraints = {
+    facingMode,
+  };
+
+  const toggleFacingMode = () => {
+    setFacingMode((prev) => (prev === 'user' ? 'environment' : 'user'));
+  };
+
 
   useEffect(() => {
     if (queryStudentId) setStudentId(queryStudentId );
@@ -30,6 +40,17 @@ export default function ScannerPage() {
     if (imageSrc) {
       setImages([...images, imageSrc]);
     }
+  };
+
+  const generateAndDownloadPDF = () => {
+    const pdf = new jsPDF();
+  
+    images.forEach((imgData, index) => {
+      if (index > 0) pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 10, 10, 190, 270); // Adjust position/size as needed
+    });
+  
+    pdf.save('answersheet.pdf');
   };
 
   const generateAndUploadPDF = async () => {
@@ -102,13 +123,22 @@ export default function ScannerPage() {
         />
       </div>
 
+
+      <div className="p-4">
       <Webcam
         audio={false}
         ref={webcamRef}
         screenshotFormat="image/jpeg"
-        width="100%"
-        className="rounded border"
+        videoConstraints={videoConstraints}
+        className="rounded w-full max-w-md mx-auto border"
       />
+      <button
+        onClick={toggleFacingMode}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded shadow"
+      >
+        Switch to {facingMode === 'user' ? 'Back' : 'Front'} Camera
+      </button>
+    </div>
 
       <div className="flex gap-2 justify-center">
         <button
@@ -124,6 +154,13 @@ export default function ScannerPage() {
         >
           {uploading ? 'Uploading...' : '⬆️ Upload PDF'}
         </button>
+
+        <button
+  onClick={() => generateAndDownloadPDF()}
+  className="mt-4 px-4 py-2 bg-green-600 text-white rounded shadow"
+>
+  Download PDF
+</button>
       </div>
 
       {images.length > 0 && (
